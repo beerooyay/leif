@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="120" height="40">
+  <defs>
+    <linearGradient id="autumn-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="20%" style="stop-color:#f97316"/>
+      <stop offset="80%" style="stop-color:#ef4444"/>
+    </linearGradient>
+  </defs>
+  <!-- leif text - Space Grotesk SemiBold style -->
+  <text x="0" y="28" font-family="Space Grotesk, sans-serif" font-weight="600" font-size="28" fill="white">leif</text>
+  <!-- leaf icon from lucide -->
+  <g transform="translate(70, 8)" fill="url(#autumn-grad)">
+    <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+    <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" stroke="url(#autumn-grad)" stroke-width="2" fill="none"/>
+  </g>
+</svg>
