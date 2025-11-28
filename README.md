@@ -6,40 +6,32 @@ leif is a new architecture for language modeling that treats conversations as gr
 
 ---
 
-## results: real ubuntu irc benchmark
+## results
 
-![benchmark results](benchmark_results/multiparty_benchmark.png)
+![perplexity comparison](benchmark_results/figures/perplexity.png)
 
-| model | test perplexity | attention density | parameters |
-|-------|-----------------|-------------------|------------|
-| baseline transformer | 212.1 | 100% | 17.9M |
-| **leif** | **180.3** | **53%** | 15.0M |
-
-**key findings:**
-- **15% lower perplexity** on real multi-party dialogue
-- **47% less attention compute** via sparse relational masking
-- **stable training** — baseline catastrophically overfits (val ppl 209 → 694), leif stays flat
-- tested on **5,000 real ubuntu irc conversations** with 4-6 agents per window
-
-### the conversation horizon problem
-
-we discovered that standard prefix sampling of multi-party datasets systematically erases relational structure:
-- ubuntu conversations are labeled as "8-14 agents"
-- but the **first N tokens** are almost always **2-agent exchanges**
-- multi-party activity happens in the **middle** of conversations
-
-**our fix:** multiparty sampling — select windows with maximum agent diversity. this dropped attention density from **98% → 53%**, finally exposing the topology leif was designed for.
+| model | perplexity | attention density | parameters |
+|-------|------------|-------------------|------------|
+| baseline transformer | 212.1 | 100% | 17.9m |
+| **leif** | **180.3** | **53%** | 15.0m |
 
 ### training dynamics
 
-baseline (red) explodes after epoch 7. leif (blue) remains stable:
+![training dynamics](benchmark_results/figures/training_dynamics.png)
 
-| epoch | baseline val ppl | leif val ppl |
-|-------|------------------|--------------|
-| 7 | 209.8 (best) | 229.5 |
-| 10 | 237.0 | 193.4 |
-| 16 | 446.2 | **179.0** (best) |
-| 20 | 694.6 | 189.5 |
+### the conversation horizon problem
+
+![horizon problem](benchmark_results/figures/horizon_problem.png)
+
+we discovered that standard prefix sampling of multi-party datasets systematically erases relational structure:
+
+- ubuntu conversations are labeled as "8-14 agents"
+- but the first n tokens are almost always 2-agent exchanges
+- multi-party activity happens in the middle of conversations
+
+our fix: **multiparty sampling** — select windows with maximum agent diversity. this dropped attention density from 98% to 53%, finally exposing the topology leif was designed for.
+
+---
 
 ## the core idea
 
