@@ -1,32 +1,40 @@
 # leif
 
-**lexia-native language modeling with graph-structured attention**
+![leif banner](media/leif-banner.png)
 
-leif is a new architecture for language modeling that treats conversations as graphs of participation events (lexia) rather than flat token sequences. by encoding relational structure directly into the attention mask, leif achieves **24x lower perplexity** than baseline transformers on multi-party dialogue while using **72% less attention compute**.
+**graph-structured attention for lexia-native language modeling**
+
+leif treats conversations as graphs of participation events (lexia) rather than flat token sequences. by encoding relational structure directly into the attention mask, leif achieves better perplexity with less compute—and doesn't overfit like dense transformers.
 
 ---
 
 ## results
 
-![perplexity comparison](paper/figures/perplexity.png)
+![test set perplexity](media/vis1.png)
 
 | model | perplexity | attention density | parameters |
 |-------|------------|-------------------|------------|
-| baseline transformer | 95.6 | 100% | 2.30m |
-| transformer + speaker tokens | 47.2 | 100% | 2.45m |
-| **leif-nano** | **3.96** | **28%** | 2.57m |
+| baseline transformer | 212.1 | 100% | 17.9m |
+| **leif** | **180.3** | **53%** | 15.0m |
 
-### scaling behavior
+### generalization gap
 
-![scaling](paper/figures/scaling.png)
+![training dynamics](media/vis2.png)
 
-### ablation study
+baseline overfits catastrophically — train/val gap explodes to 3.86 by epoch 20. leif maintains a tight gap of 1.08 throughout training. the relational structure prevents memorization and forces actual learning.
 
-![ablation](paper/figures/ablation.png)
+### the conversation horizon problem
 
-### per-lexia semantic mass
+![attention density comparison](media/vis3.png)
 
-![semantic mass distribution](paper/figures/mass.png)
+we discovered that standard prefix sampling of multi-party datasets systematically erases relational structure:
+- ubuntu conversations are labeled as "8-14 agents"
+- but the first n tokens are almost always 2-agent exchanges
+- multi-party activity happens in the middle of conversations
+
+our fix: **multiparty sampling** — select windows with maximum agent diversity. this dropped attention density from 98% to 53%, finally exposing the topology leif was designed for.
+
+---
 
 ## the core idea
 
@@ -50,6 +58,8 @@ the **lexical mask** encodes this graph structure directly into attention:
 
 this is not learned sparsity. the mask is **derived deterministically from the data**.
 
+---
+
 ## installation
 
 ```bash
@@ -64,35 +74,34 @@ pip install -r requirements.txt
 from leif import LeifModel, LexiaDataset, build_lexical_mask
 
 # load data
-dataset = LexiaDataset.from_ubuntu_dialogue("path/to/data")
+dataset = LexiaDataset.load("data/ubuntu_multiparty")
 
 # build model
 model = LeifModel(
-    vocab_size=8000,
+    vocab_size=25000,
     d_model=256,
     n_heads=4,
     n_layers=6,
-    max_seq_len=128
+    max_seq_len=512
 )
 
 # train
-python -m leif.train --data path/to/data --epochs 10
+python -m leif.train --data data/ubuntu_multiparty --epochs 20
 ```
 
 ## reproduce paper results
 
 ```bash
-# generate synthetic multi-party dialogue
-python -m leif.data --output data/synthetic --n_conversations 10000
+# parse ubuntu dialogue corpus with multiparty sampling
+python -m leif.ubuntu_real --max_conversations 5000
 
-# train leif-nano
-python -m leif.train --data data/synthetic --model leif --output runs/leif
+# train baseline
+python -m leif.train --model baseline --data data/ubuntu_multiparty \
+    --epochs 20 --batch_size 16 --max_seq_len 512
 
-# train baseline for comparison
-python -m leif.train --data data/synthetic --model baseline --output runs/baseline
-
-# compute per-lexia semantic mass
-python -m experiments.compute_mass --leif runs/leif --baseline runs/baseline
+# train leif
+python -m leif.train --model leif --data data/ubuntu_multiparty \
+    --epochs 20 --batch_size 16 --max_seq_len 512
 ```
 
 ---
@@ -101,14 +110,7 @@ python -m experiments.compute_mass --leif runs/leif --baseline runs/baseline
 
 **lexical information physics: from tokens to participation events**
 
-> [**read the full paper (pdf)**](paper/lip.pdf) | [view source (latex)](paper/lip.tex)
-
-<details>
-<summary><b>abstract</b></summary>
-
-we introduce lexical information physics (lip), a framework that treats language not as sequences of tokens but as streams of participation events called lexia. each lexia is a tuple encoding sender, receiver, conduit, time, and token payload. we prove that token-only models are marginalizations of lexia models and pay an information penalty bounded by the conditional mutual information of relational coordinates. we implement leif, a lexia-native architecture using graph-structured attention via a lexical mask derived from relational coordinates. on synthetic multi-party dialogue, leif achieves 24x lower perplexity than baseline transformers while using 72% less attention compute. ablation studies confirm that the lexical mask—the graph topology of the conversation—is the dominant factor. we introduce empirical semantic mass as a per-lexia measure of information loss from marginalization and show it concentrates at structurally significant positions.
-
-</details>
+> [**read the full paper (pdf)**](docs/lip.pdf) | [view source (latex)](docs/lip.tex)
 
 ### key contributions
 
@@ -139,10 +141,10 @@ leif-nano
 ## citation
 
 ```bibtex
-@article{rouyea2024lip,
+@article{rouyea2025lip,
   title={lexical information physics: from tokens to participation events},
   author={rouyea, blaize},
-  year={2024},
+  year={2025},
   note={available at https://github.com/beerooyay/leif}
 }
 ```
