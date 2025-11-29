@@ -1,47 +1,32 @@
-<p align="center">
-  <img src="media/leif-banner.png" alt="leif banner" width="100%" />
-</p>
+# leif
 
 **lexia-native language modeling with graph-structured attention**
 
-leif is a new architecture for language modeling that treats conversations as graphs of participation events (lexia) rather than flat token sequences. by encoding relational structure directly into the attention mask, leif achieves **15% lower perplexity** than baseline transformers on real-world multi-party dialogue while using **47% less attention compute**.
+leif is a new architecture for language modeling that treats conversations as graphs of participation events (lexia) rather than flat token sequences. by encoding relational structure directly into the attention mask, leif achieves **24x lower perplexity** than baseline transformers on multi-party dialogue while using **72% less attention compute**.
 
 ---
 
 ## results
 
-<p align="center">
-  <img src="media/vis3.png" alt="training dynamics" width="100%" />
-</p>
+![perplexity comparison](paper/figures/perplexity.png)
 
 | model | perplexity | attention density | parameters |
 |-------|------------|-------------------|------------|
-| baseline transformer | 212.1 | 100% | 17.9m |
-| **leif** | **180.3** | **53%** | 15.0m |
+| baseline transformer | 95.6 | 100% | 2.30m |
+| transformer + speaker tokens | 47.2 | 100% | 2.45m |
+| **leif-nano** | **3.96** | **28%** | 2.57m |
 
-### generalization gap
+### scaling behavior
 
-<p align="center">
-  <img src="media/vis2.png" alt="generalization gap" width="100%" />
-</p>
+![scaling](paper/figures/scaling.png)
 
-baseline overfits catastrophically — train/val gap explodes to **3.86** by epoch 20. leif maintains a tight gap of **1.08** throughout training. the relational structure prevents memorization and forces actual learning.
+### ablation study
 
-### the conversation horizon problem
+![ablation](paper/figures/ablation.png)
 
-<p align="center">
-  <img src="media/vis1.png" alt="horizon problem" width="100%" />
-</p>
+### per-lexia semantic mass
 
-we discovered that standard prefix sampling of multi-party datasets systematically erases relational structure:
-
-- ubuntu conversations are labeled as "8-14 agents"
-- but the first n tokens are almost always 2-agent exchanges
-- multi-party activity happens in the middle of conversations
-
-our fix: **multiparty sampling** — select windows with maximum agent diversity. this dropped attention density from 98% to 53%, finally exposing the topology leif was designed for.
-
----
+![semantic mass distribution](paper/figures/mass.png)
 
 ## the core idea
 
@@ -154,10 +139,10 @@ leif-nano
 ## citation
 
 ```bibtex
-@article{rouyea2025lip,
+@article{rouyea2024lip,
   title={lexical information physics: from tokens to participation events},
   author={rouyea, blaize},
-  year={2025},
+  year={2024},
   note={available at https://github.com/beerooyay/leif}
 }
 ```

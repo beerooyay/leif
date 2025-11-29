@@ -30,7 +30,7 @@ data/
 runs/
 results/
 
-# benchmark results (keep PNGs and JSONs, ignore models)
+# keep benchmark results but ignore large model files
 benchmark_results/**/*.pt
 benchmark_results/**/*.pth
 
