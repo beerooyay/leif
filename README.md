@@ -1,4 +1,6 @@
-# leif
+<p align="center">
+  <img src="media/leif-banner.png" alt="leif banner" width="100%" />
+</p>
 
 **lexia-native language modeling with graph-structured attention**
 
@@ -8,20 +10,28 @@ leif is a new architecture for language modeling that treats conversations as gr
 
 ## results
 
-![perplexity comparison](benchmark_results/figures/perplexity.png)
+<p align="center">
+  <img src="media/vis3.png" alt="training dynamics" width="100%" />
+</p>
 
 | model | perplexity | attention density | parameters |
 |-------|------------|-------------------|------------|
 | baseline transformer | 212.1 | 100% | 17.9m |
 | **leif** | **180.3** | **53%** | 15.0m |
 
-### training dynamics
+### generalization gap
 
-![training dynamics](benchmark_results/figures/training_dynamics.png)
+<p align="center">
+  <img src="media/vis2.png" alt="generalization gap" width="100%" />
+</p>
+
+baseline overfits catastrophically — train/val gap explodes to **3.86** by epoch 20. leif maintains a tight gap of **1.08** throughout training. the relational structure prevents memorization and forces actual learning.
 
 ### the conversation horizon problem
 
-![horizon problem](benchmark_results/figures/horizon_problem.png)
+<p align="center">
+  <img src="media/vis1.png" alt="horizon problem" width="100%" />
+</p>
 
 we discovered that standard prefix sampling of multi-party datasets systematically erases relational structure:
 
