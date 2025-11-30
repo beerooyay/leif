@@ -28,11 +28,8 @@ env/
 # data and runs (large files)
 data/
 runs/
+benchmark_results/
 results/
-
-# keep benchmark results but ignore large model files
-benchmark_results/**/*.pt
-benchmark_results/**/*.pth
 
 # model checkpoints
 *.pt
